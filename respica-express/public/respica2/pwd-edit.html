@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>欢迎页面-X-admin2.0</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport"
+    content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+  <link rel="stylesheet" href="./static/css/font.css">
+  <link rel="stylesheet" href="./static/css/xadmin.css">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="./static/lib/layui/layui.js" charset="utf-8"></script>
+  <script type="text/javascript" src="./static/js/xadmin.js"></script>
+
+</head>
+
+<body>
+  <div class="x-body layui-anim layui-anim-up">
+    <form class="layui-form" id="pwd_edit">
+
+      <input type="text" name="build_id" id="build_id" hidden />
+
+      <div class="layui-form-item">
+        <label for="L_pwd" class="layui-form-label">
+          <span class="x-red">*</span>新密码：
+        </label>
+        <div class="layui-input-inline">
+          <input type="text" name="pwd" id="pwd" required="" lay-verify="spica_pwd1" autocomplete="off"
+            class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label for="L_pwd2" class="layui-form-label">
+          <span class="x-red">*</span>确认密码：
+        </label>
+        <div class="layui-input-inline">
+          <input type="text" name="pwd2" id="pwd2" required="" lay-verify="spica_pwd2" autocomplete="off"
+            class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label for="L_edit" class="layui-form-label">
+        </label>
+        <button class="layui-btn" lay-filter="edit" lay-submit="">修改 </button>
+      </div>
+    </form>
+  </div>
+  <script>
+    layui.use(['form', 'layer'], function () {
+      $ = layui.jquery;
+      var form = layui.form,
+        layer = layui.layer;
+      var isToken = localStorage.getItem("token")
+      // 获得list页面传过来的id
+      var _id = getQueryVariable("id");
+      //数据回填（填个id就行）
+      $('#build_id').val(_id);
+
+      //自定义验证规则
+      form.verify({
+        spica_pwd1: function (value) {
+          const a = value
+          if (a.length < 6 || a.length > 12) {
+            return '密码长度为6到12位';
+          }
+        },
+        spica_pwd2: function (value) {
+          if ($('#pwd').val() != $('#pwd2').val()) {
+            return '两次密码不一致';
+          }
+        }
+      });
+
+
+      //监听提交
+      form.on('submit(edit)', function (data) {
+        $.ajax({
+          headers: {
+            "token": isToken
+          },
+          data: data.field,
+          type: "post",
+          url: "/api2/login/pwdedit",
+          success: function (result) {
+            layer.alert(result.msg, {
+              icon: 6
+            }, function () {
+              // 获得frame索引
+              var index = parent.layer.getFrameIndex(window.name);
+              //关闭当前frame
+              parent.layer.close(index);
+              parent.location.reload();
+            });
+          }
+        })
+        return false;
+      });
+
+
+
+
+
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>欢迎页面-X-admin1.0</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport"
+    content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+  <link rel="stylesheet" href="./static/css/font.css">
+  <link rel="stylesheet" href="./static/css/xadmin.css">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="./static/lib/layui/layui.js" charset="utf-8"></script>
+  <script type="text/javascript" src="./static/js/xadmin.js"></script>
+
+</head>
+
+<body>
+  <div class="x-body layui-anim layui-anim-up">
+    <form class="layui-form" id="build_add">
+      <input type="text" name="admin_id" id="admin_id" hidden />
+      <div class="layui-form-item">
+        <label for="L_build" class="layui-form-label">
+          <span class="x-red">*</span>栋名称：
+        </label>
+        <div class="layui-input-inline">
+          <input type="text" id="L_build" name="build" required="" lay-verify="spica_name" autocomplete="off"
+            class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label for="L_user" class="layui-form-label">
+          <span class="x-red">*</span>负责人
+        </label>
+        <div class="layui-input-inline">
+          <input type="text" id="L_user" name="user" required="" lay-verify="spica_user" autocomplete="off"
+            class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux" style="margin-left: 75px;">
+          1到12个字符
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label for="L_phone" class="layui-form-label">
+          <span class="x-red">*</span>负责人电话
+        </label>
+        <div class="layui-input-inline">
+          <input type="number" id="L_phone" name="phone" required lay-verify="spica_phone" autocomplete="off"
+            class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label for="L_add" class="layui-form-label">
+        </label>
+        <button class="layui-btn" lay-filter="add" lay-submit="">增加 </button>
+      </div>
+    </form>
+  </div>
+  <script>
+    layui.use(['form', 'layer'], function () {
+      $ = layui.jquery;
+      var form = layui.form,
+        layer = layui.layer;
+      var isToken = localStorage.getItem("token");
+      var admin = localStorage.getItem("admin");
+      $('#admin_id').val(admin);
+      //自定义验证规则
+      form.verify({
+        spica_name: function (value) {
+          let a = value;
+          if (a.length < 1 || a.length > 12) {
+            return '栋名必须1到12位';
+          }
+        },
+        spica_user: function (value) {
+          let a = value;
+          if (a.length < 1 || a.length > 12) {
+            return '负责人名称必须1到12位';
+          }
+        },
+        spica_phone: function (value) {
+          let a = value;
+          if (a.length != 11) {
+            return '请正确输入电话号码';
+          }
+        }
+      });
+
+      //监听提交
+      form.on('submit(add)', function (data) {
+        console.log(data);
+        // 通过查找栋名字确定是否已被注册
+        $.ajax({
+          headers: {
+            "token": isToken
+          },
+          data: { 'build': data.field.build },
+          type: "get",
+          url: "/api/dorm/build/find",
+          success: function (result) {
+            //查看电话是否有相同的
+            if (result.count == 0) {
+              $.ajax({
+                headers: {
+                  "token": isToken
+                },
+                data: { 'phone': data.field.phone },
+                type: "get",
+                url: "/api/dorm/build/find",
+                success: function (result) {
+                  if (result.count == 0) {
+                    $.ajax({
+                      headers: {
+                        "token": isToken
+                      },
+                      data: data.field,
+                      type: "post",
+                      url: "/api/dorm/build/add",
+                      success: function (result) {
+                        layer.alert(result.msg, {
+                          icon: 6
+                        }, function () {
+                          // 获得frame索引
+                          var index = parent.layer.getFrameIndex(window.name);
+                          //关闭当前frame
+                          parent.layer.close(index);
+                          parent.location.reload();
+                        });
+                      }
+                    })
+                  } else {
+                    // 注册过的
+                    layer.alert("此电话已被注册，请重新输入电话", {
+                      icon: 5
+                    })
+                  }
+                }
+              })
+            } else {
+              // 注册过的
+              layer.alert("此栋名字已被注册，请重新输入栋名", {
+                icon: 5
+              })
+            }
+          }
+        })
+        return false;
+      });
+    });
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>欢迎页面-X-admin1.0</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport"
+    content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+  <link rel="stylesheet" href="./static/css/font.css">
+  <link rel="stylesheet" href="./static/css/xadmin.css">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="./static/lib/layui/layui.js" charset="utf-8"></script>
+  <script type="text/javascript" src="./static/js/xadmin.js"></script>
+
+</head>
+
+<body>
+  <div class="x-body layui-anim layui-anim-up">
+    <form class="layui-form" id="repair_finsh">
+
+      <input type="text" id="repair_id" name="repair_id" hidden/>
+
+      <div class="layui-form-item">
+        <label for="L_system" class="layui-form-label">
+          <span class="x-red">*</span>维修员选择：
+        </label>
+        <div class="layui-input-inline">
+          <select name="repairman" id="repairman" class="layui-select"></select>
+        </div>
+      </div>
+
+
+      <div class="layui-form-item">
+          <label for="L_system" class="layui-form-label">
+            <span class="x-red">*</span>维修结果：
+          </label>
+          <div class="layui-input-inline">
+              <textarea name="rremark" class="layui-textarea" id="rremark" cols="60" rows="10"
+              lay-verify="spica_rremark"></textarea>
+          </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label for="L_system" class="layui-form-label">
+              <span class="x-red">*</span>费用：
+            </label>
+            <div class="layui-input-inline">
+              <input type="number" class="layui-input" name="pay" id="pay"/>
+            </div>
+          </div>
+
+          <div class="layui-form-item">
+              <label for="L_system" class="layui-form-label">
+                <span class="x-red">*</span>付费对象：
+              </label>
+              <div class="layui-input-inline">
+                <select name="flag2" id="flag2" class="layui-select">
+                  <option value="0">学生</option>
+                  <option value="1">学校</option>
+                </select>
+              </div>
+            </div>
+
+
+
+      <div class="layui-form-item">
+        <label for="L_add" class="layui-form-label">
+        </label>
+        <button class="layui-btn" lay-filter="add" lay-submit="">提交 </button>
+      </div>
+
+    </form>
+  </div>
+  <script>
+    layui.use(['form', 'layer', 'upload'], function () {
+      $ = layui.jquery;
+      var form = layui.form,
+        layer = layui.layer,
+        upload = layui.upload;
+      var isToken = localStorage.getItem("token");
+      var _id = getQueryVariable("id");
+      console.log(_id);
+      $('#repair_id').val(_id);
+
+
+
+      //维修员选择框
+      $.ajax({
+          headers: {
+            "token": isToken
+          },
+          type: "get",
+          url: "/api/repair/repairman",
+          success: function (result) {
+            var html = "";
+            for (var i = 0; i < result.data.length; i++) {
+              html += "<option value=" + result.data[i]._id + ">" + result.data[i].rmname + "</option>";
+            }
+            $("#repairman").append(html);
+            form.render('select');
+          }
+        })
+
+
+      //监听提交
+      form.on('submit(add)', function (data) {
+
+        var field = data.field;
+        $.ajax({
+          headers: {
+            "token": isToken
+          },
+          type: "post",
+          data: field,
+          url: "/api/repair/repair/finsh",
+          success: function (result) {
+            layer.alert(result.msg, {
+              icon: 6
+            }, function () {
+              // 获得frame索引
+              var index = parent.layer.getFrameIndex(window.name);
+              //关闭当前frame
+              parent.layer.close(index);
+              parent.location.reload();
+            });
+          }
+        })
+
+
+        return false;
+      });
+
+
+
+
+    });
+  </script>
+
+</body>
+
+</html>

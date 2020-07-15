@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>欢迎页面-X-admin1.0</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport"
+    content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+  <link rel="stylesheet" href="./static/css/font.css">
+  <link rel="stylesheet" href="./static/css/xadmin.css">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="./static/lib/layui/layui.js" charset="utf-8"></script>
+  <script type="text/javascript" src="./static/js/xadmin.js"></script>
+  <link rel="stylesheet" href="./static/js/steps/style.css">
+</head>
+
+<body class="layui-anim layui-anim-up">
+  <div id="step_demo" class="step-body">
+    <div class="step-header" style="width:80%;overflow: hidden;">
+      <!-- 这两个li相当于两个tip页面的标题 -->
+      <ul>
+        <li>
+          <span class="step-name">设置学号长度</span>
+        </li>
+        <li>
+          <span class="step-name">设置学号内置信息</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="step-content"> 
+      <!-- 这两个div相当于两个tip页面 -->
+      <div class="step-list" style="padding:120px;">
+        <label for="" class="layui-form-label">学号长度：</label>
+        <div class="layui-input-inline">
+          <input type="number" class="layui-input" id="idlength" maxlength="2" />
+        </div>
+      </div>
+
+      <div class="step-list" style="padding: 20px; padding-left: 60px">
+        <div>
+          <span>请在以下模拟的学号中填写符合范围的数字:</span>
+          <span id="idtext"></span>
+        </div>
+
+
+        <form class="layui-form" id="system_add">
+
+          <!-- 记录长度 -->
+          <input type="text" name="size" id="saveSize" hidden>
+          <!-- 记录id -->
+          <input type="text" name="id" id="saveId"hidden>
+
+
+          <div style="margin-top:18px">
+            <label for="" class="layui-form-label">届号范围:</label>
+            <div class="layui-input-inline">
+              <input type="number" class="layui-input" name="grade1" maxlength="2" required="" lay-verify="spica_num" />
+            </div>
+            <label>~</label>
+            <div class="layui-input-inline">
+              <input type="number" class="layui-input" name="grade2" maxlength="2" required="" lay-verify="spica_num" />
+            </div>
+          </div>
+
+
+          <div style="margin-top:18px">
+            <label for="" class="layui-form-label">专业号范围:</label>
+            <div class="layui-input-inline">
+              <input type="number" class="layui-input" name="system1" maxlength="2" required=""
+                lay-verify="spica_num" />
+            </div>
+            <label>~</label>
+            <div class="layui-input-inline">
+              <input type="number" class="layui-input" name="system2" maxlength="2" required=""
+                lay-verify="spica_num" />
+            </div>
+          </div>
+
+
+          <div style="margin-top:18px">
+            <label for="" class="layui-form-label">班级号范围:</label>
+            <div class="layui-input-inline">
+              <input type="number" class="layui-input" name="class1" maxlength="2" required="" lay-verify="spica_num" />
+            </div>
+            <label>~</label>
+            <div class="layui-input-inline">
+              <input type="number" class="layui-input" name="class2" maxlength="2" required="" lay-verify="spica_num" />
+            </div>
+          </div>
+
+
+          <div style="margin-top:18px">
+            <label for="" class="layui-form-label">班级排名范围:</label>
+            <div class="layui-input-inline">
+              <input type="number" class="layui-input" name="rank1" maxlength="2" required="" lay-verify="spica_num" />
+            </div>
+            <label>~</label>
+            <div class="layui-input-inline">
+              <input type="number" class="layui-input" name="rank2" maxlength="2" required="" lay-verify="spica_num" />
+            </div>
+          </div>
+
+
+          <div class="layui-form-item">
+            <label for="L_add" class="layui-form-label">
+            </label>
+            <button class="layui-btn" lay-filter="add" lay-submit="">增加 </button>
+          </div>
+        </form>
+
+
+
+      </div>
+    </div>
+  </div>
+  <div style="margin-left:180px;padding: 100px">
+    <button id="nextBtn" class="layui-btn">下一步</button>
+  </div>
+
+  <script>
+    layui.config({
+      base: './static/js/steps/'  //引入steps模块
+    })
+    layui.use(['table', 'layer', 'steps'], function () {
+      var table = layui.table;
+      var layer = layui.layer;
+      var form = layui.form;
+      var isToken = localStorage.getItem("token");  //获取token
+      var id = getQueryVariable("id");              //找到传过来的id
+      var $step = $("#step_demo").step();           //设置step模块
+      var idlength;                                 //定义输入的长度
+
+      $("#nextBtn").click(function (event) {  //点击下一步触发，任务包括按键css变化，检测输入的值，创建一个字符赋值给一个span给用户观看的
+        idlength = parseInt($('#idlength').val()) + 1;
+        var idtext = '1';
+        for (let i = 2; i < idlength; i++) {
+          let a = '-' + i
+          idtext = idtext + a
+        }
+        $('#idtext').html(idtext);
+        $('#saveSize').val(idlength-1);
+        if ((idlength - 1) < 8 || (idlength - 1) > 16) {
+          layer.msg('学号长度不能少于8或大于16')
+        } else {
+          $('#nextBtn').css('display', 'none');
+          $step.nextStep();//下一步  就是哪个模块最重要的一步..
+        }
+      });
+
+      //把传来的id赋值给一个不可见的输入框，用于等下传值
+      $.ajax({
+        headers: {
+          "token": isToken
+        },
+        type: "get",
+        url: "/api/schoolrule/idrule/find",
+        data: {
+          id
+        },
+        success: function (result) {
+          var data = result.data;
+          $("#saveId").val(data._id)
+        }
+      })
+
+      //自定义验证规则，给填写范围的输入框用到，让它是两位数且是正整数
+      form.verify({
+        spica_num: function (value) {
+          let a = /^[1-9]\d*$/;
+          let b = Number(value)
+          if (b > 99 || b < 1 || !(a.test(b))) {
+            return '输入不规范,请输入1~2位正整数';
+          }
+        }
+      });
+
+      //监听提交
+      form.on('submit(add)', function (data) {
+        const field = data.field;//获取可见和不可见的input的内容
+        const grade1 = parseInt(field.grade1);
+        const grade2 = parseInt(field.grade2);
+        const system1 = parseInt(field.system1);
+        const system2 = parseInt(field.system2);
+        const class1 = parseInt(field.class1);
+        const class2 = parseInt(field.class2);
+        const rank1 = parseInt(field.rank1);
+        const rank2 = parseInt(field.rank2);
+        const arr = [grade1, grade2, system1, system2, class1, class2, rank1, rank2];//获去所有范围的数字，用于检测
+
+        const pd1 = arr.every(function (value, index, array) {  //判断条件一：是否有超出范围的数
+          return parseInt(value) < parseInt(idlength);
+        })
+        const pd2 = Boolean(new Set(arr).size !== arr.length);  //判断条件二: 是否有相同数字
+
+        if (pd2) {
+          layer.msg('重置失败，输入框有重复数据');
+        } else if (!pd1) {
+          layer.msg('重置失败填写不规范');
+        } else { //判断完成就可以开始重置
+          $.ajax({
+            headers: {
+              "token": isToken
+            },
+            data: field,
+            type: "post",
+            url: "/api/schoolrule/idrule/edit",
+            success: function (result) {
+              layer.alert(result.msg, {
+                icon: 6
+              }, function () {
+                // 获得frame索引
+                var index = parent.layer.getFrameIndex(window.name);
+                //关闭当前frame
+                parent.layer.close(index);
+                parent.location.reload();
+              });
+            }
+          })
+        }
+        return false;
+      });
+
+
+
+
+
+
+
+
+    });
+  </script>
+</body>
+
+</html>

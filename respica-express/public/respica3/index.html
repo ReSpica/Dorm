@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>后台管理</title>
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+        content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <link rel="stylesheet" href="./static/css/font.css">
+    <link rel="stylesheet" href="./static/css/xadmin.css">
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script src="./static/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./static/js/xadmin.js"></script>
+</head>
+
+<body>
+    <!-- 顶部开始 -->
+    <div class="container">
+        <div class="logo" style="height:36;width:210"><a href="./index.html"><img src="./static/imgs/logo1.png"
+                    style="height:72px;width:420px" /></a></div>
+        <!-- <div class="left_open">
+            <i title="展开左侧栏" class="iconfont">&#xe647;</i>
+        </div> -->
+
+        <ul class="layui-nav right" lay-filter="">
+            <li class="layui-nav-item">
+                <a href="javascript:;" id="student_name">admin</a>
+                <dl class="layui-nav-child">
+                    <!-- 二级菜单 -->
+                    <!-- <dd><a onclick="x_admin_show('个人信息','http://www.baidu.com')">个人信息</a></dd>
+                    <dd><a onclick="x_admin_show('切换帐号','http://www.baidu.com')">切换帐号</a></dd> -->
+                    <dd><a id="edit_pwd">修改密码</a></dd>
+                    <dd><a id="exit">退出</a></dd>
+                </dl>
+            </li>
+            <!-- <li class="layui-nav-item to-index"><a href="/">前台首页</a></li> -->
+        </ul>
+
+    </div>
+    <!-- 顶部结束 -->
+    <!-- 中部开始 -->
+    <!-- 左侧菜单开始 -->
+    <!-- <div class="left-nav">
+        <div id="side-nav">
+            <ul id="nav">
+
+                <li>
+                    <a _href="01-notice.html">
+                        <i class="iconfont">&#xe672;</i>
+                        <cite>公告通知</cite>
+                        <i class="iconfont nav_right">&#xe603;</i>
+                    </a>
+                </li>
+                <li>
+                    <a _href="02-we-list.html">
+                        <i class="iconfont">&#xe66f;</i>
+                        <cite>水电单交付</cite>
+                        <i class="iconfont nav_right">&#xe603;</i>
+                    </a>
+                </li>
+                <li>
+                    <a _href="03-we-list.html">
+                        <i class="iconfont">&#xe68e;</i>
+                        <cite>我的保修单</cite>
+                        <i class="iconfont nav_right">&#xe603;</i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div> -->
+    <!-- <div class="x-slide_left"></div> -->
+    <!-- 左侧菜单结束 -->
+    <!-- 右侧主体开始 -->
+    <div class="page-content">
+        <div class="layui-tab tab" lay-filter="xbs_tab" lay-allowclose="false">
+            <div class="layui-tab-content">
+                <div class="layui-tab-item layui-show">
+                    <iframe src='01-notice.html' frameborder="0" scrolling="yes" class="x-iframe"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page-content-bg"></div>
+    <!-- 右侧主体结束 -->
+    <!-- 中部结束 -->
+    <!-- 底部开始 -->
+    <div class="footer">
+        <div class="copyright">form @respica 2020</div>
+    </div>
+    <!-- 底部结束 -->
+
+    <script>
+        $("#exit").click(function () {
+            window.localStorage.removeItem("token3");
+            window.localStorage.removeItem("student_id");
+            window.localStorage.removeItem("student_name");
+            window.localStorage.removeItem("student_dormId");
+            window.location.href = './login.html'
+        })
+
+
+        layui.use(['layer'], function () {
+            var layer = layui.layer;
+            var isToken = localStorage.getItem("token3");
+            if (isToken == null || isToken == " ") {
+                layer.alert("请先登录！", {
+                    closeBtn: 0,
+                    icon: 3,
+                    title: '提示信息'
+                }, function () {
+                    window.location.href = "./login.html"
+
+                })
+            } else {
+                $.ajax({
+                    headers: {
+                        token: isToken
+                    },
+                    type: "get",
+                    url: "/api3/admin",
+                    success: function (result) {
+                        if (result.msg == 'token过期') {
+                            layer.alert("登录已过期，请重新登录！", {
+                                closeBtn: 0,
+                                icon: 3,
+                                title: '提示信息'
+                            }, function () {
+                                window.location.href = "./login.html"
+                            })
+                        }
+                    }
+                })
+            }
+            var data = window.localStorage.getItem("student_name");
+            var student_id = window.localStorage.getItem("student_id");
+            document.getElementById("student_name").innerHTML = data    
+
+            $('#edit_pwd').click(function(){
+            layer.open({
+              type: 2,
+              title: '修改密码',
+              area: ['600px', '400px'], //宽高
+              shadeClose: true,
+              content: 'pwd-edit.html?id=' + student_id
+            })
+        })
+        })
+    </script>
+
+</body>
+
+</html>

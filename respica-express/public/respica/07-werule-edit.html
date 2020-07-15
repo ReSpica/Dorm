@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>欢迎页面-X-admin2.0</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport"
+    content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+  <link rel="stylesheet" href="./static/css/font.css">
+  <link rel="stylesheet" href="./static/css/xadmin.css">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="./static/lib/layui/layui.js" charset="utf-8"></script>
+  <script type="text/javascript" src="./static/js/xadmin.js"></script>
+
+</head>
+
+<body>
+  <div class="x-body layui-anim layui-anim-up">
+    <form class="layui-form" id="werule_edit">
+
+      <input type="text" name="werule_id" id="werule_id" hidden />
+          <div class="layui-col-xs6 layui-col-sm6 layui-col-md6">
+            <div class="layui-form-item">
+              <label for="L_erelief" class="layui-form-label">
+                <span class="x-red">*</span>电费减免(度/人)：
+              </label>
+              <div class="layui-input-inline">
+                <input type="number" name="erelief" id="erelief" required lay-verify="spica_erelief" autocomplete="off"
+                  class="layui-input">
+              </div>
+            </div>
+            <div class="layui-form-item">
+                <label for="L_efirst" class="layui-form-label">
+                  <span class="x-red">*</span>一档电费(元/度)：
+                </label>
+                <div class="layui-input-inline">
+                  <input type="number" name="efirst" id="efirst" required lay-verify="spica_efirst" autocomplete="off"
+                    class="layui-input">
+                </div>
+              </div>
+            <div class="layui-form-item">
+              <label for="L_esecond" class="layui-form-label">
+                <span class="x-red">*</span>二档电费(元/度)：
+              </label>
+              <div class="layui-input-inline">
+                <input type="number" name="esecond" id="esecond" required lay-verify="spica_esecond" autocomplete="off"
+                  class="layui-input">
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <label for="L_ethird" class="layui-form-label">
+                <span class="x-red">*</span>三档电费(元/度):
+              </label>
+              <div class="layui-input-inline">
+                <input type="number" name="ethird" id="ethird" required lay-verify="spica_ethird" autocomplete="off"
+                  class="layui-input">
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <label for="L_et1" class="layui-form-label">
+                <span class="x-red">*</span>一档最大用电量(度):
+              </label>
+              <div class="layui-input-inline">
+                <input type="number" name="et1" id="et1" required lay-verify="spica_et1" autocomplete="off"
+                  class="layui-input">
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <label for="L_et2" class="layui-form-label">
+                <span class="x-red">*</span>二档最大用电量(度):
+              </label>
+              <div class="layui-input-inline">
+                <input type="number" name="et2" id="et2" required lay-verify="spica_et2" autocomplete="off"
+                  class="layui-input">
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <span style="color:brown; font-size: 16px">注意，如果是无挡位收费，请把三个挡位设置一样的值</span>
+              </div>
+          </div>
+
+          <div class="layui-col-xs6 layui-col-sm6 layui-col-md6">
+            <div class="layui-form-item">
+              <label for="L_wrelief" class="layui-form-label">
+                <span class="x-red">*</span>水费减免(吨/人)：
+              </label>
+              <div class="layui-input-inline">
+                <input type="number" name="wrelief" id="wrelief" required lay-verify="spica_wrelief" autocomplete="off"
+                  class="layui-input">
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <label for="L_wfirst" class="layui-form-label">
+                <span class="x-red">*</span>一档水费(元/吨)：
+              </label>
+              <div class="layui-input-inline">
+                <input type="number" name="wfirst" id="wfirst" required lay-verify="spica_wfirst" autocomplete="off"
+                  class="layui-input">
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <label for="L_wsecond" class="layui-form-label">
+                <span class="x-red">*</span>二档水费(元/吨)：
+              </label>
+              <div class="layui-input-inline">
+                <input type="number" name="wsecond" id="wsecond" required lay-verify="spica_wsecond" autocomplete="off"
+                  class="layui-input">
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <label for="L_wthird" class="layui-form-label">
+                <span class="x-red">*</span>三档水费(元/吨):
+              </label>
+              <div class="layui-input-inline">
+                <input type="number" name="wthird" id="wthird" required lay-verify="spica_wthird" autocomplete="off"
+                  class="layui-input">
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <label for="L_wt1" class="layui-form-label">
+                <span class="x-red">*</span>一档最大用水量(吨):
+              </label>
+              <div class="layui-input-inline">
+                <input type="number" name="wt1" id="wt1" required lay-verify="spica_wt1" autocomplete="off"
+                  class="layui-input">
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <label for="L_wt2" class="layui-form-label">
+                <span class="x-red">*</span>二档最大用水量(吨):
+              </label>
+              <div class="layui-input-inline">
+                <input type="number" name="wt2" id="wt2" required lay-verify="spica_wt2" autocomplete="off"
+                  class="layui-input">
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <label for="L_edit" class="layui-form-label">
+              </label>
+              <button class="layui-btn" lay-filter="edit" id="edit" lay-submit="">修改</button>
+            </div>
+          </div>
+    </form>
+
+
+  <script>
+    layui.use(['form', 'layer'], function () {
+      $ = layui.jquery;
+      var form = layui.form,
+        layer = layui.layer;
+      var isToken = localStorage.getItem("token");
+      // 获得list页面传过来的id
+      var _id = getQueryVariable("id");
+
+      //自定义验证规则
+      // form.verify({
+      //   spica_dorm: function (value) {
+      //     let a = value;
+      //     if (a.length < 1 || a.length > 6) {
+      //       return '宿舍号长度必须1到6位';
+      //     }
+      //   },
+      //   spica_max: function (value) {
+      //     let a = value;
+      //     if (a.length < 1 || a.length > 2) {
+      //       return '床位名称长度必须1到2位';
+      //     }
+      //   },
+      // });
+
+      // 数据回填
+      $.ajax({
+        headers: {
+          "token": isToken
+        },
+        type: "get",
+        url: "/api/we/werule/find",
+        data: {
+          _id
+        },
+        success: function (result) {
+          var data = result.data;
+          $("#erelief").val(data[0].erelief);
+          $('#efirst').val(data[0].efirst);
+          $('#esecond').val(data[0].esecond);
+          $('#ethird').val(data[0].ethird);
+          $('#wrelief').val(data[0].wrelief);
+          $('#wfirst').val(data[0].wfirst);
+          $('#wsecond').val(data[0].wsecond);
+          $('#wthird').val(data[0].wthird);
+          $('#et1').val(data[0].et1);
+          $('#et2').val(data[0].et2);
+          $('#wt1').val(data[0].wt1);
+          $('#wt2').val(data[0].wt2);
+          $('#werule_id').val(data[0]._id);
+          form.render();
+        }
+      });
+
+
+
+
+
+      //监听提交
+      form.on('submit(edit)', function (data) {
+        const field = data.field;
+        //开始修改
+        $.ajax({
+          headers: {
+            "token": isToken
+          },
+          data: field,
+          type: "post",
+          url: "/api/we/werule/edit",
+          success: function (result) {
+            layer.alert(result.msg, {
+              icon: 6
+            }, function () {
+              // 获得frame索引
+              var index = parent.layer.getFrameIndex(window.name);
+              //关闭当前frame
+              parent.layer.close(index);
+              parent.location.reload();
+            });
+          }
+        })
+        return false;
+      });
+    });
+  </script>
+</body>
+
+</html>

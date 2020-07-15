@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>欢迎页面-X-admin1.0</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport"
+    content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+  <link rel="stylesheet" href="./static/css/font.css">
+  <link rel="stylesheet" href="./static/css/xadmin.css">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="./static/lib/layui/layui.js" charset="utf-8"></script>
+  <script type="text/javascript" src="./static/js/xadmin.js"></script>
+
+</head>
+
+<body>
+  <div class="x-body layui-anim layui-anim-up">
+    <form class="layui-form" id="tos3">
+
+      <div class="layui-form-item">
+        <label for="L_num" class="layui-form-label">
+          <span class="x-red">*</span>选择调配的宿舍：
+        </label>
+        <div class="layui-input-inline">
+          <select name="dorm" id="dorm" class="layui-select">
+          </select>
+        </div>
+      </div>
+
+
+      <div class="layui-form-item">
+        <label for="L_tos3" class="layui-form-label">
+        </label>
+        <button class="layui-btn" lay-filter="tos3" lay-submit="">开始调配 </button>
+      </div>
+
+
+
+    </form>
+  </div>
+  <script>
+    layui.use(['form', 'layer', 'upload'], function () {
+      $ = layui.jquery;
+      var form = layui.form,
+        layer = layui.layer,
+        upload = layui.upload;
+      var isToken = localStorage.getItem("token2");
+      var idArr = localStorage.getItem("idarr2");
+      // 获得list页面传过来的id
+      var build = getQueryVariable("id");
+
+      //查找栋表
+      $.ajax({
+        headers: {
+          "token": isToken
+        },
+        type: "get",
+        data: { build },
+        url: "/api2/student/s2/dorm/find",
+        success: function (result) {
+          if (result) {
+            var html = "";
+            for (var i = 0; i < result.data.length; i++) {
+              html += "<option value=" + result.data[i].dorm + ">" + result.data[i].dorm + '   (现住：' + result.data[i].now + '/床位：' + result.data[i].max + ')' + "</option>";
+            }
+            $("#dorm").append(html);
+            form.render('select');
+          }
+        },
+        error(e) {
+          alert(e)
+        }
+      })
+
+      //监听提交
+      form.on('submit(tos3)', function (data) {
+        const field = data.field;
+
+        $.ajax({
+          headers: {
+            "token": isToken
+          },
+          type: "get",
+          data: { dorm: field.dorm, build: build },
+          url: "/api2/student/s2/dorm/find",
+          success: function (result) {
+            console.log(result);
+            var js = idArr.split(',');
+            if ((result.data[0].now + js.length) > result.data[0].max) {
+              layer.msg('人数超出当前宿舍的床位数，请重新选择宿舍');
+            } else {
+              console.log('没超');
+              $.ajax({
+                headers: {
+                  "token": isToken
+                },
+                type: "get",
+                data: { idArr: idArr, dorm: field.dorm ,build:build},
+                url: "/api2/student/s2/tos3",
+                success: function (result) {
+                  layer.alert(result.msg, {
+                    icon: 6
+                  }, function () {
+                    // 获得frame索引
+                    var index = parent.layer.getFrameIndex(window.name);
+                    //关闭当前frame
+                    parent.layer.close(index);
+                    parent.location.reload();
+                  });
+                }
+              })
+            }
+          }
+        })
+
+
+
+        return false;
+      });
+
+
+
+
+    });
+  </script>
+
+</body>
+
+</html>

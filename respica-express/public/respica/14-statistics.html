@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>欢迎页面-X-admin1.0</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport"
+    content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+  <link rel="stylesheet" href="./static/css/font.css">
+  <link rel="stylesheet" href="./static/css/xadmin.css">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="./static/lib/layui/layui.js" charset="utf-8"></script>
+  <script type="text/javascript" src="./static/js/xadmin.js"></script>
+  <script type="text/javascript" src="./static/js/echarts.min.js"></script>
+</head>
+
+<body class="layui-anim layui-anim-up">
+  <div class="x-nav">
+    <span class="layui-breadcrumb">
+      <a href="">首页</a>
+      <a>
+        <cite>统计分析</cite>
+      </a>
+    </span>
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right"
+      href="javascript:location.replace(location.href);" title="刷新" id="layui-laypage-btn">
+      <i class="layui-icon" style="line-height:30px">&#xe669;</i></a>
+  </div>
+
+  <div class="x-body">
+    <div id="main2" style="width:100%;height:400px;">
+    </div>
+    <div class="x-nav"></div>
+    <form class="layui-form" id="build_add">
+      <div class="layui-form-item">
+        <label for="L_build" class="layui-form-label">
+          <span class="x-red">*</span>年月选择：
+        </label>
+        <div class="layui-input-inline">
+          <input type="text" class="layui-input" name="year" id="test3" placeholder="选择时间" autocomplete="off" />
+        </div>
+        <div class="layui-input-inline">
+          <button class="layui-btn" lay-filter="search" lay-submit="">查找 </button>
+        </div>
+      </div>
+    </form>
+    <div id="main3" style="width:100%;height:400px;">
+    </div>
+    <div class="x-nav"></div>
+    <div id="main" style="width:100%;height:400px;">
+    </div>
+    <div class="x-nav"></div>
+    <div id="main1" style="width:80%;height:400px;">
+    </div>
+    <div class="x-nav"></div>
+  </div>
+
+
+
+  <script>
+    layui.use(['table', 'layer', 'form', 'laydate'], function () {
+      var table = layui.table;
+      var layer = layui.layer;
+      var form = layui.form;
+      var laydate = layui.laydate;
+      var isToken = localStorage.getItem("token")
+
+      //年月选择器
+      laydate.render({
+        elem: '#test3'
+        , type: 'year'
+      });
+
+      //统计属于各个维修type的报修单数量
+      $.ajax({
+        headers: {
+          "token": isToken
+        },
+        type: "get",
+        url: "/api/statistics//repair/numtype",
+        success: function (result) {
+          var myChart = echarts.init(document.getElementById('main'));
+          var option = {
+            title: {
+              text: '统计各维修类型所占的维修单数量(张)：'
+            },
+            tooltip: {},
+            xAxis: {
+              data: result.data.types
+            },
+            yAxis: {},
+            series: [{
+              name: '数量',
+              type: 'bar',
+              data: result.data.nums
+            }]
+          }
+          myChart.setOption(option);
+        }
+      })
+
+
+      //统计宿舍付费于学校付费统计
+      $.ajax({
+        headers: {
+          "token": isToken
+        },
+        type: "get",
+        url: "/api/statistics/repair/sdpay",
+        success: function (result) {
+          var myChart = echarts.init(document.getElementById('main1'));
+          var option = {
+            title: {
+              text: '统计学校与学生的维修金额(元)：'
+            },
+            tooltip: {},
+            xAxis: {
+              data: ['学校', '学生']
+            },
+            yAxis: {},
+            series: [{
+              name: '付费金额',
+              type: 'bar',
+              data: result.data
+            }]
+          }
+          myChart.setOption(option);
+        }
+      })
+
+
+      //统计宿舍付费于学校付费统计
+      $.ajax({
+        headers: {
+          "token": isToken
+        },
+        type: "get",
+        url: "/api/statistics/build/nowmax",
+        success: function (result) {
+          var myChart = echarts.init(document.getElementById('main2'));
+          var option = {
+            title: {
+              text: '学生住宿情况:'
+            },
+            legend: {},
+            tooltip: {},
+            dataset: {
+              source: result.data
+            },
+            xAxis: { type: 'category' },
+            yAxis: {},
+            // Declare several bar series, each will be mapped
+            // to a column of dataset.source by default.
+            series: [
+              { type: 'bar' },
+              { type: 'bar' }
+            ]
+          }
+          myChart.setOption(option);
+        }
+      })
+
+
+
+      //统计平均水电单费用 1
+      form.on('submit(search)', function (data) {
+        const field = data.field;
+        $.ajax({
+          headers: {
+            "token": isToken
+          },
+          type: "get",
+          data: field,
+          url: "/api/statistics/we",
+          success: function (result) {
+            console.log(result);
+            var myChart = echarts.init(document.getElementById('main3'));
+            var option = {
+              title: {
+                text: '平均水电费(元):'
+              },
+              xAxis: {
+                type: 'category',
+                data: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月',]
+              },
+              yAxis: {
+                type: 'value'
+              },
+              series: [{
+                data: result.data,
+                type: 'line',
+                smooth: true
+              }]
+            }
+            myChart.setOption(option);
+          }
+        })
+
+
+        return false;
+      });
+
+
+      //统计平均水电单费用 2
+      var date = new Date().getFullYear()
+      $.ajax({
+        headers: {
+          "token": isToken
+        },
+        type: "get",
+        data: { year: date },
+        url: "/api/statistics/we",
+        success: function (result) {
+          console.log(result);
+          var myChart = echarts.init(document.getElementById('main3'));
+          var option = {
+            title: {
+              text: '平均水电费(元):'
+            },
+            xAxis: {
+              type: 'category',
+              data: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月',]
+            },
+            yAxis: {
+              type: 'value'
+            },
+            series: [{
+              data: result.data,
+              type: 'line',
+              smooth: true
+            }]
+          }
+          myChart.setOption(option);
+        }
+      })
+
+    });
+
+  </script>
+</body>
+
+</html>

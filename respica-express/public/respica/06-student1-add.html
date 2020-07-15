@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>欢迎页面-X-admin1.0</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport"
+    content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+  <link rel="stylesheet" href="./static/css/font.css">
+  <link rel="stylesheet" href="./static/css/xadmin.css">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="./static/lib/layui/layui.js" charset="utf-8"></script>
+  <script type="text/javascript" src="./static/js/xadmin.js"></script>
+
+</head>
+
+<body>
+  <div class="x-body layui-anim layui-anim-up">
+    <form class="layui-form" id="student1_add">
+
+      <div class="layui-form-item">
+        <label for="L_num" class="layui-form-label">
+          <span class="x-red">*</span>学号：
+        </label>
+        <div class="layui-input-inline">
+          <input type="number" id="sno" name="sno" required lay-verify="spica_sno" autocomplete="off"
+            class="layui-input">
+        </div>
+      </div>
+
+      <div class="layui-form-item">
+        <label for="L_system" class="layui-form-label">
+          <span class="x-red">*</span>名字：
+        </label>
+        <div class="layui-input-inline">
+          <input type="text" id="sname" name="sname" required lay-verify="spica_sname" autocomplete="off"
+            class="layui-input" />
+        </div>
+      </div>
+
+      <div class="layui-form-item">
+        <label for="L_system" class="layui-form-label">
+          <span class="x-red">*</span>性别：
+        </label>
+        <div class="layui-input-inline">
+          <select name="ssex" id="ssex">
+            <option value="1">男</option>
+            <option value="2">女</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="layui-form-item">
+        <label for="L_system" class="layui-form-label">
+          <span class="x-red">*</span>电话：
+        </label>
+        <div class="layui-input-inline">
+          <input type="number" id="sphone" name="sphone" required lay-verify="phone" autocomplete="off"
+            class="layui-input" />
+        </div>
+      </div>
+
+
+
+      <div class="layui-form-item">
+        <label for="L_add" class="layui-form-label">
+        </label>
+        <button class="layui-btn" lay-filter="add" lay-submit="">添加 </button>
+      </div>
+
+
+
+    </form>
+  </div>
+  <script>
+    layui.use(['form', 'layer', 'upload'], function () {
+      $ = layui.jquery;
+      var form = layui.form,
+        layer = layui.layer,
+        upload = layui.upload;
+      var isToken = localStorage.getItem("token")
+
+      //自定义验证规则
+      form.verify({
+        spica_sname: function (value) {
+          let a = value;
+          if (a.length < 2 || a.length > 12) {
+            return '用户名长度必须2到12位';
+          }
+        }
+      });
+
+
+
+      //监听提交
+      form.on('submit(add)', function (data) {
+        $.ajax({
+          headers: {
+            "token": isToken
+          },
+          type: "get",
+          url: "/api/schoolrule/idrule",
+          success: function (result) {
+            if (parseInt(result.data[0].size) != parseInt(data.field.sno.length)) {
+              layer.msg('输入的学号不符合所设置的学号长度：' + result.data[0].size)
+            } else {
+              $.ajax({
+                headers: {
+                  "token": isToken
+                },
+                type: "get",
+                data: { sno :data.field.sno },
+                url: "/api/student/s1/find",
+                success: function (result) {
+                  if (result.count != 0) {
+                    layer.msg('学号重复了，请重新输入')
+                  } else {
+                    $.ajax({
+                      headers: {
+                        "token": isToken
+                      },
+                      type: "post",
+                      data: data.field,
+                      url: "/api/student/s1/add",
+                      success: function (result) {
+                        layer.alert(result.msg, {
+                          icon: 6
+                        }, function () {
+                          // 获得frame索引
+                          var index = parent.layer.getFrameIndex(window.name);
+                          //关闭当前frame
+                          parent.layer.close(index);
+                          parent.location.reload();
+                        });
+                      }
+                    })
+                  }
+                }
+              })
+            }
+          }
+        })
+
+
+        return false;
+      });
+
+
+
+
+    });
+  </script>
+
+</body>
+
+</html>

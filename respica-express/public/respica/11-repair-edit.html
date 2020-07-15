@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>欢迎页面-X-admin1.0</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport"
+    content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+  <link rel="stylesheet" href="./static/css/font.css">
+  <link rel="stylesheet" href="./static/css/xadmin.css">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="./static/lib/layui/layui.js" charset="utf-8"></script>
+  <script type="text/javascript" src="./static/js/xadmin.js"></script>
+
+</head>
+
+<body>
+  <div class="x-body layui-anim layui-anim-up">
+    <form class="layui-form" id="repair_finsh">
+      <input type="text" id="repair_id" name="repair_id" hidden />
+
+      <div class="layui-col-xs6 layui-col-sm6 layui-col-md6">
+        <div class="layui-form-item">
+          <label for="L_build" class="layui-form-label">
+            <span class="x-red">*</span>栋：
+          </label>
+          <div class="layui-input-inline">
+            <input type="text" id="build" class="layui-input" disabled />
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label for="L_dorm" class="layui-form-label">
+            <span class="x-red">*</span>宿舍：
+          </label>
+          <div class="layui-input-inline">
+            <input type="text" id="dorm" class="layui-input" disabled />
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label for="L_sno" class="layui-form-label">
+            <span class="x-red">*</span>申请人学号：
+          </label>
+          <div class="layui-input-inline">
+            <input type="text" id="sno" class="layui-input" disabled />
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label for="L_sphone" class="layui-form-label">
+            <span class="x-red">*</span>电话：
+          </label>
+          <div class="layui-input-inline">
+            <input type="text" id="sphone" class="layui-input" disabled />
+          </div>
+        </div>
+
+        <div class="layui-form-item">
+          <label for="L_sremark" class="layui-form-label">
+            <span class="x-red">*</span>问题反馈：
+          </label>
+          <div class="layui-input-inline">
+            <textarea class="layui-textarea" id="sremark" cols="60" rows="10" lay-verify="spica_rremark"
+              disabled></textarea>
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label for="L_sremark" class="layui-form-label">
+            <span class="x-red">*</span>图片：
+          </label>
+          <div class="layui-input-inline">
+            <div class="layui-upload-list">
+              <img class="layui-upload-img" id="demo1" style="width:100px;height:auth">
+              <p id="demoText"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="layui-form-item">
+          <label for="L_sremark" class="layui-form-label">
+            <span class="x-red">*</span>报修起始时间：
+          </label>
+          <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="time" disabled>
+          </div>
+        </div>
+      </div>
+
+      <div class="layui-col-xs6 layui-col-sm6 layui-col-md6">
+        <div class="layui-form-item">
+          <label for="L_repairman" class="layui-form-label">
+            <span class="x-red">*</span>报修类型：
+          </label>
+          <div class="layui-input-inline">
+            <select name="type" id="type" class="layui-select"></select>
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label for="L_repairman" class="layui-form-label">
+            <span class="x-red">*</span>维修员：
+          </label>
+          <div class="layui-input-inline">
+            <select name="repairman" id="repairman" class="layui-select"></select>
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label for="L_system" class="layui-form-label">
+            <span class="x-red">*</span>维修结果：
+          </label>
+          <div class="layui-input-inline">
+            <textarea name="rremark" class="layui-textarea" id="rremark" cols="60" rows="10"
+              lay-verify="spica_rremark"></textarea>
+          </div>
+        </div>
+
+        <div class="layui-form-item">
+          <label for="L_system" class="layui-form-label">
+            <span class="x-red">*</span>费用：
+          </label>
+          <div class="layui-input-inline">
+            <input type="number" class="layui-input" name="pay" id="pay" />
+          </div>
+        </div>
+
+        <div class="layui-form-item">
+          <label for="L_system" class="layui-form-label">
+            <span class="x-red">*</span>付费对象：
+          </label>
+          <div class="layui-input-inline">
+            <select id="flag2" name="flag2" class="layui-select">
+              <option value="0">学生</option>
+              <option value="1">学校</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="layui-form-item">
+          <label for="L_sremark" class="layui-form-label">
+            <span class="x-red">*</span>报修结束时间：
+          </label>
+          <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="oktime" name="oktime" disabled>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="layui-form-item">
+        <label for="L_edit" class="layui-form-label">
+        </label>
+        <button class="layui-btn" lay-filter="edit" lay-submit="">修改 </button>
+      </div>
+
+    </form>
+  </div>
+  <script>
+    layui.use(['form', 'layer', 'upload'], function () {
+      $ = layui.jquery;
+      var form = layui.form,
+        layer = layui.layer,
+        upload = layui.upload;
+      var isToken = localStorage.getItem("token");
+      var _id = getQueryVariable("id");
+      console.log(_id);
+      $('#repair_id').val(_id);
+
+
+
+      //维修员选择框
+      $.ajax({
+        headers: {
+          "token": isToken
+        },
+        type: "get",
+        url: "/api/repair/repairman",
+        success: function (result) {
+          var html = "";
+          for (var i = 0; i < result.data.length; i++) {
+            html += "<option value=" + result.data[i]._id + ">" + result.data[i].rmname + "</option>";
+          }
+          $("#repairman").append(html);
+          form.render('select');
+        }
+      })
+
+      //报修类型选择框
+      $.ajax({
+        headers: {
+          "token": isToken
+        },
+        type: "get",
+        url: "/api/repair/repair/type",
+        success: function (result) {
+          var html = "";
+          for (var i = 0; i < result.data.length; i++) {
+            html += "<option value=" + result.data[i]._id + ">" + result.data[i].type + "</option>";
+          }
+          $("#type").append(html);
+          form.render('select');
+        }
+      })
+
+
+      //数据回填
+      $.ajax({
+        headers: {
+          "token": isToken
+        },
+        type: "get",
+        data: { '_id': _id },
+        url: "/api/repair/repair/find",
+        success: function (result) {
+          $('#sno').val(result.data[0].sno);
+          $('#sphone').val(result.data[0].sphone);
+          $('#build').val(result.data[0].build.build);
+          $('#dorm').val(result.data[0].dorm.dorm);
+          $('#type').val(result.data[0].type._id);
+          $('#sremark').val(result.data[0].sremark);
+          if(result.data[0].repairman){
+            $('#repairman').val(result.data[0].repairman._id);
+          }
+          $('#rremark').val(result.data[0].rremark);
+          $("#demo1").attr('src', 'http://localhost:2333/' + result.data[0].photo);
+          if (result.data[0].flag2 == 0) {
+            $('#pay').val(result.data[0].dpay);
+          } else {
+            $('#pay').val(result.data[0].spay);
+          }
+          $("#flag2").val(result.data[0].flag2);
+          function detailTime(d) {
+            var html = ""
+            var date = new Date(d);
+            var Y = date.getFullYear() + '-';
+            var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+            var D = (date.getDate() < 10 ? '0' + date.getDate() : date.getDate()) + ' ';
+            var h = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':';
+            var m = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':';
+            var s = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds());
+            html += Y + M + D + h + m + s;
+            return html;
+          }
+          $("#time").val(detailTime(result.data[0].time));
+          if (result.data[0].oktime) {
+            $("#oktime").val(detailTime(result.data[0].oktime));
+          }
+          form.render();
+        }
+      })
+      //监听提交
+      form.on('submit(edit)', function (data) {
+
+        var field = data.field;
+        console.log(field);
+        if (field.oktime) {
+          console.log('处理过')
+          $.ajax({
+            headers: {
+              "token": isToken
+            },
+            type: "post",
+            data: field,
+            url: "/api/repair/repair/edit",
+            success: function (result) {
+              layer.alert(result.msg, {
+                icon: 6
+              }, function () {
+                // 获得frame索引
+                var index = parent.layer.getFrameIndex(window.name);
+                //关闭当前frame
+                parent.layer.close(index);
+                parent.location.reload();
+              });
+            }
+          })
+        } else {
+          console.log('没处理过')
+          layer.msg('当前报修单只有查看功能，无法修改');
+        }
+
+
+        return false;
+      });
+
+
+
+
+    });
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>欢迎页面-X-admin1.0</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport"
+    content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+  <link rel="stylesheet" href="./static/css/font.css">
+  <link rel="stylesheet" href="./static/css/xadmin.css">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="./static/lib/layui/layui.js" charset="utf-8"></script>
+  <script type="text/javascript" src="./static/js/xadmin.js"></script>
+
+</head>
+
+<body>
+  <div class="x-body layui-anim layui-anim-up">
+    <form class="layui-form" id="build_add">
+
+
+      <div class="layui-form-item">
+        <label for="L_build" class="layui-form-label">
+          <span class="x-red">*</span>年月选择：
+        </label>
+        <div class="layui-input-inline">
+          <input type="text" class="layui-input" name="year_mouth" id="test3" placeholder="选择时间" autocomplete="off"/>
+        </div>
+      </div>
+
+      <div class="layui-form-item">
+        <label for="L_build" class="layui-form-label">
+          <span class="x-red">*</span>宿舍选择：
+        </label>
+        <div class="layui-input-inline">
+          <select name="dorm" id="dorm" class="layui-select"></select>
+        </div>
+      </div>
+
+
+      <div class="layui-form-item">
+        <label for="L_electric" class="layui-form-label">
+          <span class="x-red">*</span>用电量(度)：
+        </label>
+        <div class="layui-input-inline">
+          <input type="number" id="L_electric" name="electric" required lay-verify="spica_electric" autocomplete="off"
+            class="layui-input">
+        </div>
+      </div>
+
+
+      <div class="layui-form-item">
+        <label for="L_water" class="layui-form-label">
+          <span class="x-red">*</span>用水量(吨)：
+        </label>
+        <div class="layui-input-inline">
+          <input type="number" id="L_ewater" name="water" required lay-verify="spica_water" autocomplete="off"
+            class="layui-input">
+        </div>
+      </div>
+
+
+      <div class="layui-form-item">
+        <label for="L_add" class="layui-form-label">
+        </label>
+        <button class="layui-btn" lay-filter="add" lay-submit="">增加 </button>
+      </div>
+
+    </form>
+  </div>
+  <script>
+    layui.use(['form', 'layer', 'laydate'], function () {
+      $ = layui.jquery;
+      var form = layui.form;
+      var layer = layui.layer;
+      var laydate = layui.laydate;
+      var isToken = localStorage.getItem("token2");
+      var build_admin = localStorage.getItem("build_admin");
+      var build_admin_id = localStorage.getItem("build_admin_id");
+
+
+      //年月选择器
+      laydate.render({
+        elem: '#test3'
+        , type: 'month'
+      });
+
+
+      //自定义验证规则
+      form.verify({
+        spica_electric: function (value) {
+          let a = value;
+          if (a.length < 1 || a.length > 6) {
+            return '长度必须1到5位';
+          }
+        },
+        spica_max: function (value) {
+          let a = value;
+          if (a.length < 1 || a.length > 3) {
+            return '长度必须1到3位';
+          }
+        },
+      });
+
+      //查找所属栋的宿舍，放在选择框上
+      $.ajax({
+        headers: {
+          "token": isToken
+        },
+        type: "get",
+        data:{build:build_admin_id},
+        url: "/api2/student/s2/dorm/find",
+        success: function (result) {
+          if (result) {
+            var html = "";
+            for (var i = 0; i < result.data.length; i++) {
+              html += "<option value=" + result.data[i]._id + ">" + result.data[i].dorm+ '   (现住：' + result.data[i].now + '/床位：' + result.data[i].max + ')' + "</option>";
+            }
+            $("#dorm").append(html);
+            form.render('select');
+          }
+        },
+        error(e) {
+          alert(e)
+        }
+      })
+      //监听提交
+      form.on('submit(add)', function (data) {
+        const field = data.field;
+        const year_mouth = (field.year_mouth).split('-')
+        $.ajax({
+          headers: {
+            "token": isToken
+          },
+          type: "get",
+          data: { dorm: field.dorm, year: year_mouth[0], month: year_mouth[1] },
+          url: "/api2/we/we/find",
+          success: function (result) {
+            console.log(result);
+            if (result.count == 0) {
+              $.ajax({
+                headers: {
+                  "token": isToken
+                },
+                type: "post",
+                data: data.field,
+                url: "/api2/we/we/add",
+                success: function (result) {
+                  layer.alert(result.msg, {
+                    icon: 6
+                  }, function () {
+                    // 获得frame索引
+                    var index = parent.layer.getFrameIndex(window.name);
+                    //关闭当前frame
+                    parent.layer.close(index);
+                    parent.location.reload();
+                  });
+                },
+                error(e) {
+                  alert(e)
+                }
+              })
+            }else{
+              layer.msg('当前水单已经存在，请重新填写');
+            }
+          },
+          error(e) {
+            alert(e)
+          }
+        })
+
+        return false;
+      });
+    });
+  </script>
+
+</body>
+
+</html>

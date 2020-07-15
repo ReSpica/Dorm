@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>欢迎页面-X-admin1.0</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport"
+    content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+  <link rel="stylesheet" href="./static/css/font.css">
+  <link rel="stylesheet" href="./static/css/xadmin.css">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="./static/lib/layui/layui.js" charset="utf-8"></script>
+  <script type="text/javascript" src="./static/js/xadmin.js"></script>
+</head>
+
+<body class="layui-anim layui-anim-up">
+  <div class="x-nav">
+    <span class="layui-breadcrumb">
+      <a href="">首页</a>
+      <a>
+        <cite>新建学生列表</cite>
+      </a>
+    </span>
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right"
+      href="javascript:location.replace(location.href);" title="刷新" id="layui-laypage-btn">
+      <i class="layui-icon" style="line-height:30px">&#xe669;</i></a>
+  </div>
+
+  <div class="x-body">
+
+    <xblock>
+      <form class="layui-form" style="margin:0 auto;">
+        <div class="layui-form-item" style="text-align:center;">
+          <label>届:</label>
+          <div class="layui-inline" style="width:250px;">
+            <input type="number" class="layui-input" id="grade" name="grade" />
+          </div>
+          <label>专业:</label>
+          <div class="layui-inline" style="width:250px;">
+            <select name="system" id="system" class="layui-select">
+              <option value="">请选择</option>
+            </select>
+          </div>
+          <label>班级:</label>
+          <div class="layui-inline" style="width:250px;">
+            <input type="number" class="layui-input" id="class" name="class" />
+          </div>
+
+
+          <div class="layui-inline">
+            <button class="layui-btn" lay-filter="search" lay-submit="">查找</button>
+          </div>
+
+        </div>
+      </form>
+      <button class="layui-btn" onclick="x_admin_show('添加学生','06-student1-add.html',600,400)">
+        <i class="layui-icon"></i>添加
+      </button>
+    </xblock>
+    <table class="layui-hide" id="customer_tab" lay-filter="customer_fil"></table>
+
+    <script type="text/html" id="toolbarDemo">
+      <div  class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="getCheckData">批量调配</button>
+      </div>
+    </script>
+
+    <script type="text/html" id="barDemo">
+      <div class="layui-btn-container">
+        <a  class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">修改</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+      </div>
+    </script>
+
+  </div>
+
+  <script>
+    layui.use(['table', 'layer', 'form'], function () {
+      var table = layui.table;
+      var layer = layui.layer;
+      var form = layui.form;
+      var isToken = localStorage.getItem("token")
+
+      // table渲染
+      table.render({
+        elem: '#customer_tab',
+        height: 0,
+        url: '/api/student/s1', //数据接口
+        headers: {
+          token: isToken
+        },
+        page: true, //开启分页
+
+        toolbar: '#toolbarDemo', //开启头部工具栏，并为其绑定左侧模板
+
+        defaultToolbar: ['filter', 'exports'],//开启右侧
+
+        request: {
+          pageName: 'begin',
+          limitName: 'length'
+        },
+        cols: [
+          [ //表头
+            { type: 'checkbox' },
+            {
+              field: 'sno',
+              title: '学号',
+              align: 'center'
+            },
+            {
+              field: 'sname',
+              title: '学生名字',
+              align: 'center'
+            },
+            {
+              field: 'ssex',
+              title: '性别',
+              align: 'center',
+              sort: true,
+              templet: function (d) {
+                var html = ""
+                if (d.ssex == 1) {
+                  html += '<span>男</span>'
+                } else {
+                  html += '<span>女</span>'
+                }
+                return html;
+              }
+            },
+            {
+              field: 'sphone',
+              title: '电话',
+              align: 'center'
+            },
+            {
+              field: 'spwd',
+              title: '密码',
+              align: 'center'
+            },
+            {
+              field: 'build',
+              title: '所属栋',
+              align: 'center',
+              templet: function (d) {
+                var html = ""
+                if (!d.build) {
+                  html += '<span style="color:brown;font-size:18px">暂无数据</span>'
+                }
+                return html;
+              }
+            },
+            {
+              field: 'dorm',
+              title: '所属宿舍',
+              align: 'center',
+              templet: function (d) {
+                var html = ""
+                if (!d.dorm) {
+                  html += '<span style="color:brown;font-size:18px">暂无数据</span>'
+                }
+                return html;
+              }
+            },
+            {
+              field: 'flag',
+              title: '状态',
+              align: 'center',
+              templet: function (d) {
+                var html = ""
+                if (d.flag == 0) {
+                  html += '<span style="color:brown;font-size:18px">等待调配</span>'
+                } else if (d.flag == 1) {
+                  html += '<span style="color:cornflowerblue;font-size:18px">等待入住宿舍</span>'
+                } else {
+                  html += '<span style="color:green;font-size:18px">已入住</span>'
+
+                }
+
+                return html;
+              }
+            },
+            {
+              fixed: 'right',
+              title: '操作',
+              align: 'center',
+              toolbar: '#barDemo'
+            }
+          ]
+        ]
+      });
+
+
+
+      //监听工具条
+      table.on('tool(customer_fil)', function (obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+        var data = obj.data; //获得当前行数据
+        var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+        var tr = obj.tr; //获得当前行 tr 的DOM对象
+        var id = data._id;
+
+        if (layEvent === 'edit') { //修改
+          layer.open({
+            type: 2,
+            title: '水电标准修改页面',
+            area: ['600px', '400px'], //宽高
+            shadeClose: true,
+            content: '06-student1-edit.html?id=' + id,
+          });
+        } else if (layEvent === 'del') {
+          layer.confirm('确定删除行数据吗?', {
+            icon: 3,
+            title: '提示信息'
+          }, function (index) {
+            $.ajax({
+              headers: {
+                "token": isToken
+              },
+              type: "get",
+              data: data,
+              url: "/api/student/s1/delete/?id=" + id,
+              success: function (result) {
+                layer.msg(result.msg, {
+                  icon: 1,
+                  time: 1500
+                }, function () {
+                  obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
+                  $(".layui-laypage-btn").click();
+                });
+              }
+            })
+            layer.close(index);
+            //向服务端发送删除指令
+          });
+        }
+      });
+
+
+      //头工具栏事件
+      table.on('toolbar(customer_fil)', function (obj) {
+        var checkStatus = table.checkStatus(obj.config.id);
+        switch (obj.event) {
+          case 'getCheckData':
+            var data = checkStatus.data;
+            if (data.length < 1) {
+              layer.msg('请选择需要调配的学生');
+              break;
+            }
+            var idArr = [];
+            data.forEach(function (value, index, array) {
+              idArr.push(value._id)
+            })
+            console.log(idArr);
+            //把数组放在服务器缓存中
+            window.localStorage.setItem('idarr', idArr);
+            layer.open({
+              type: 2,
+              title: '选择调配的栋',
+              area: ['600px', '400px'], //宽高
+              shadeClose: true,
+              content: '06-student1-tos2.html'
+            })
+            break;
+        };
+      });
+
+
+     //查找所有的专业，放在选择框上
+      $.ajax({
+        headers: {
+          "token": isToken
+        },
+        type: "get",
+        url: "/api/schoolrule/system",
+        success: function (result) {
+          if (result) {
+            var html = "";
+            for (var i = 0; i < result.data.length; i++) {
+              html += "<option value=" + result.data[i].num + ">" + result.data[i].system + "</option>";
+            }
+            $("#system").append(html);
+            form.render('select');
+          }
+        },
+        error(e) {
+          alert(e)
+        }
+      })
+
+      form.on('submit(search)', function (data) {
+        var formData = data.field;
+
+        console.log(formData);
+        // table渲染
+        table.render({
+          elem: '#customer_tab',
+          height: 0,
+          url: '/api/student/s1Search', //数据接口
+          where:formData,
+          headers: {
+            token: isToken
+          },
+          page: true, //开启分页
+
+          toolbar: '#toolbarDemo', //开启头部工具栏，并为其绑定左侧模板
+
+          defaultToolbar: ['filter', 'exports'],//开启右侧
+
+          request: {
+            pageName: 'begin',
+            limitName: 'length'
+          },
+          cols: [
+            [ //表头
+              { type: 'checkbox' },
+              {
+                field: 'sno',
+                title: '学号',
+                align: 'center'
+              },
+              {
+                field: 'sname',
+                title: '学生名字',
+                align: 'center'
+              },
+              {
+                field: 'ssex',
+                title: '性别',
+                align: 'center',
+                sort: true,
+                templet: function (d) {
+                  var html = ""
+                  if (d.ssex == 1) {
+                    html += '<span>男</span>'
+                  } else {
+                    html += '<span>女</span>'
+                  }
+                  return html;
+                }
+              },
+              {
+                field: 'sphone',
+                title: '电话',
+                align: 'center'
+              },
+              {
+                field: 'spwd',
+                title: '密码',
+                align: 'center'
+              },
+              {
+                field: 'build',
+                title: '所属栋',
+                align: 'center',
+                templet: function (d) {
+                  var html = ""
+                  if (!d.build) {
+                    html += '<span style="color:brown;font-size:18px">暂无数据</span>'
+                  }
+                  return html;
+                }
+              },
+              {
+                field: 'dorm',
+                title: '所属宿舍',
+                align: 'center',
+                templet: function (d) {
+                  var html = ""
+                  if (!d.dorm) {
+                    html += '<span style="color:brown;font-size:18px">暂无数据</span>'
+                  }
+                  return html;
+                }
+              },
+              {
+                field: 'flag',
+                title: '状态',
+                align: 'center',
+                templet: function (d) {
+                  var html = ""
+                  if (d.flag == 0) {
+                    html += '<span style="color:brown;font-size:18px">等待调配</span>'
+                  } else if (d.flag == 1) {
+                    html += '<span style="color:cornflowerblue;font-size:18px">等待入住宿舍</span>'
+                  } else {
+                    html += '<span style="color:green;font-size:18px">已入住</span>'
+
+                  }
+
+                  return html;
+                }
+              },
+              {
+                fixed: 'right',
+                title: '操作',
+                align: 'center',
+                toolbar: '#barDemo'
+              }
+            ]
+          ]
+        });
+
+
+        return false;
+      });
+
+
+
+
+    });
+
+
+
+
+  </script>
+</body>
+
+</html>

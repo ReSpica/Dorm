@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>欢迎页面-X-admin1.0</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport"
+    content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+  <link rel="stylesheet" href="./static/css/font.css">
+  <link rel="stylesheet" href="./static/css/xadmin.css">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="./static/lib/layui/layui.js" charset="utf-8"></script>
+  <script type="text/javascript" src="./static/js/xadmin.js"></script>
+
+</head>
+
+<body>
+  <div class="x-body layui-anim layui-anim-up">
+    <form class="layui-form" id="tos3">
+
+      <div class="layui-form-item">
+        <label for="L_num" class="layui-form-label">
+          <span class="x-red">*</span>公告内容：
+        </label>
+        <div class="layui-input-inline">
+          <textarea name="notice" id="notice" cols="30" rows="10" class="layui-textarea"></textarea>
+        </div>
+      </div>
+
+
+      <div class="layui-form-item">
+        <label for="L_edit" class="layui-form-label">
+        </label>
+        <button class="layui-btn" lay-filter="edit" lay-submit="">修改 </button>
+      </div>
+
+
+
+    </form>
+  </div>
+  <script>
+    layui.use(['form', 'layer', 'upload'], function () {
+      $ = layui.jquery;
+      var form = layui.form,
+        layer = layui.layer,
+        upload = layui.upload;
+      var isToken = localStorage.getItem("token2");
+      var idArr = localStorage.getItem("idarr2");
+      // 获得list页面传过来的id
+      var _id = getQueryVariable("id");
+
+      //数据回填
+      $.ajax({
+        headers: {
+          "token": isToken
+        },
+        type: "get",
+        data: { _id },
+        url: "/api2/notice/find",
+        success: function (result) {
+          $('#notice').val(result.data[0].notice)
+        },
+        error(e) {
+          alert(e)
+        }
+      })
+
+      //监听提交
+      form.on('submit(edit)', function (data) {
+        const field = data.field;
+
+
+        $.ajax({
+          headers: {
+            "token": isToken
+          },
+          type: "post",
+          data: {_id:_id,notice:field.notice},
+          url: "/api2/notice/edit",
+          success: function (result) {
+            layer.alert(result.msg, {
+              icon: 6
+            }, function () {
+              // 获得frame索引
+              var index = parent.layer.getFrameIndex(window.name);
+              //关闭当前frame
+              parent.layer.close(index);
+              parent.location.reload();
+            });
+          }
+        })
+
+
+
+
+        return false;
+      });
+
+
+
+
+    });
+  </script>
+
+</body>
+
+</html>

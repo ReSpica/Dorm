@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>欢迎页面-X-admin1.0</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport"
+    content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+  <link rel="stylesheet" href="./static/css/font.css">
+  <link rel="stylesheet" href="./static/css/xadmin.css">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="./static/lib/layui/layui.js" charset="utf-8"></script>
+  <script type="text/javascript" src="./static/js/xadmin.js"></script>
+
+</head>
+
+<body>
+  <div class="x-body layui-anim layui-anim-up">
+    <form class="layui-form" id="system_add">
+      <input type="number" id="date" name="date" hidden />
+      <div class="layui-form-item">
+        <label for="L_num" class="layui-form-label">
+          <span class="x-red">*</span>公告对象：
+        </label>
+        <div class="layui-input-inline">
+          <select class="layui-select" name="flag" id="flag">
+            <option value="1">学生</option>
+            <option value="2">舍监</option>
+          </select>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label for="L_system" class="layui-form-label">
+          <span class="x-red">*</span>公告内容：
+        </label>
+        <div class="layui-input-inline">
+          <textarea name="notice" class="layui-textarea" id="notice" cols="60" rows="10" lay-verify="spica_notice"></textarea>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label for="L_add" class="layui-form-label">
+        </label>
+        <button class="layui-btn" lay-filter="add" lay-submit="">发布 </button>
+      </div>
+    </form>
+  </div>
+  <script>
+    layui.use(['form', 'layer'], function () {
+      $ = layui.jquery;
+      var form = layui.form,
+        layer = layui.layer;
+      var isToken = localStorage.getItem("token")
+
+      //自定义验证规则
+      form.verify({
+        spica_notice: function (value) {
+          let a = value;
+          if (a.length < 12 || a.length > 100) {
+            return '公告信息长度必须是12到100位';
+          }
+        },
+      });
+      //获取当前时间
+      const date = Date.parse(new Date())
+      $('#date').val(date);
+      //监听提交
+      form.on('submit(add)', function (data) {
+        $.ajax({
+          headers: {
+            "token": isToken
+          },
+          type: "post",
+          data:data.field,
+          url: "/api/notice/add",
+          success: function (result) {
+            layer.alert(result.msg, {
+              icon: 6
+            }, function () {
+              // 获得frame索引
+              var index = parent.layer.getFrameIndex(window.name);
+              //关闭当前frame
+              parent.layer.close(index);
+              parent.location.reload();
+            });
+          }
+        })
+        return false;
+      });
+    });
+  </script>
+
+</body>
+
+</html>

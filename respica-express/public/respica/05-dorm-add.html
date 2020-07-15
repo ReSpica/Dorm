@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>欢迎页面-X-admin1.0</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport"
+    content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+  <link rel="stylesheet" href="./static/css/font.css">
+  <link rel="stylesheet" href="./static/css/xadmin.css">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="./static/lib/layui/layui.js" charset="utf-8"></script>
+  <script type="text/javascript" src="./static/js/xadmin.js"></script>
+
+</head>
+
+<body>
+  <div class="x-body layui-anim layui-anim-up">
+    <form class="layui-form" id="build_add">
+      <input type="text" name="build_id" id="build_id" hidden />
+      <div class="layui-form-item">
+        <label for="L_build" class="layui-form-label">
+          <span class="x-red">*</span>所属栋：
+        </label>
+        <div class="layui-inline" style="width:190px;">
+          <select name="build" id="build" lay-search lay-filter="build" lay-verify="required">
+            <option value="">所属栋</option>
+          </select>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label for="L_dorm" class="layui-form-label">
+          <span class="x-red">*</span>宿舍号
+        </label>
+        <div class="layui-input-inline">
+          <input type="number" id="L_dorm" name="dorm" required="" lay-verify="spica_dorm" autocomplete="off"
+            class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label for="L_max" class="layui-form-label">
+          <span class="x-red">*</span>床位
+        </label>
+        <div class="layui-input-inline">
+          <input type="number" id="L_max" name="max" required lay-verify="spica_max" autocomplete="off"
+            class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label for="L_add" class="layui-form-label">
+        </label>
+        <button class="layui-btn" lay-filter="add" lay-submit="">增加 </button>
+      </div>
+    </form>
+  </div>
+  <script>
+    layui.use(['form', 'layer'], function () {
+      $ = layui.jquery;
+      var form = layui.form,
+        layer = layui.layer;
+      var isToken = localStorage.getItem("token");
+      var admin = localStorage.getItem("admin");
+      //自定义验证规则
+      form.verify({
+        spica_dorm: function (value) {
+          let a = value;
+          if (a.length < 1 || a.length > 6) {
+            return '宿舍号长度必须1到6位';
+          }
+        },
+        spica_max: function (value) {
+          let a = value;
+          if (a.length < 1 || a.length > 2) {
+            return '床位名称长度必须1到2位';
+          }
+        },
+      });
+
+      //查找所有的栋，放在选择框上
+      $.ajax({
+        headers: {
+          "token": isToken
+        },
+        type: "get",
+        url: "/api/dorm/build/find",
+        success: function (result) {
+          if (result) {
+            var html = "";
+            for (var i = 0; i < result.data.length; i++) {
+              html += "<option value=" + result.data[i].build + ">" + result.data[i].build + "</option>";
+            }
+            $("#build").append(html);
+            form.render('select');
+          }
+        },
+        error(e) {
+          alert(e)
+        }
+      })
+      //监听提交
+      form.on('submit(add)', function (data) {
+        const build = data.field.build;
+        const dorm = data.field.dorm;
+        $.ajax({
+          headers: {
+            "token": isToken
+          },
+          type: "get",
+          data: {
+            build: build
+          },
+          url: "/api/dorm/build/find",
+          success: function (result) {
+            console.log(result);
+            $.ajax({
+              headers: {
+                "token": isToken
+              },
+              type: "get",
+              data: {
+                build: result.data[0]._id,
+                dorm: dorm
+              },
+              url: "/api/dorm/dorm/find",
+              success: function (result) {
+                console.log(result);
+                if (result.count == 0) {
+                  $.ajax({
+                    headers: {
+                      "token": isToken
+                    },
+                    type: "post",
+                    data: data.field,
+                    url: "/api/dorm/dorm/add",
+                    success: function (result) {
+                      layer.alert(result.msg, {
+                        icon: 6
+                      }, function () {
+                        // 获得frame索引
+                        var index = parent.layer.getFrameIndex(window.name);
+                        //关闭当前frame
+                        parent.layer.close(index);
+                        parent.location.reload();
+                      });
+                    },
+                    error(e) {
+                      alert(e)
+                    }
+                  })
+                } else {
+                  layer.msg('当前位置的宿舍已经存在，请重新选择')
+                }
+              },
+              error(e) {
+                alert(e)
+              }
+            })
+          },
+          error(e) {
+            alert(e)
+          }
+        })
+        return false;
+      });
+    });
+  </script>
+
+</body>
+
+</html>

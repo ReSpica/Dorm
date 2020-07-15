@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>欢迎页面-X-admin1.0</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport"
+    content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+  <link rel="stylesheet" href="./static/css/font.css">
+  <link rel="stylesheet" href="./static/css/xadmin.css">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="./static/lib/layui/layui.js" charset="utf-8"></script>
+  <script type="text/javascript" src="./static/js/xadmin.js"></script>
+
+</head>
+
+<body>
+  <div class="x-body layui-anim layui-anim-up">
+    <form class="layui-form" id="admin_add">
+
+      <div class="layui-form-item">
+        <label for="L_admin" class="layui-form-label">
+          <span class="x-red">*</span>用户名
+        </label>
+        <div class="layui-input-inline">
+          <input type="text" id="L_admin" name="admin" required="" lay-verify="nikename" autocomplete="off"
+            class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label for="L_password" class="layui-form-label">
+          <span class="x-red">*</span>密码
+        </label>
+        <div class="layui-input-inline">
+          <input type="password" id="L_password" name="password" required="" lay-verify="pass" autocomplete="off"
+            class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux" style="margin-left: 75px;">
+          6到16个字符
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label for="L_password2" class="layui-form-label">
+          <span class="x-red">*</span>确认密码
+        </label>
+        <div class="layui-input-inline">
+          <input type="password" id="L_password2" name="password2" required lay-verify="repass" autocomplete="off"
+            class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label for="L_add" class="layui-form-label">
+        </label>
+        <button class="layui-btn" lay-filter="add" lay-submit="">增加 </button>
+      </div>
+    </form>
+  </div>
+  <script>
+    layui.use(['form', 'layer'], function () {
+      $ = layui.jquery;
+      var form = layui.form,
+        layer = layui.layer;
+      var isToken = localStorage.getItem("token")
+
+      //自定义验证规则
+      form.verify({
+        nikename: function (value) {
+          let a = value;
+          if (a.length < 5 || a.length>12) {
+            return '用户名必须6到12位';
+          }
+        },
+        pass: [ /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,}$/, '密码必须6到12位字母和数字'],
+        repass: function (value) {
+          if ($('#L_password').val() != $('#L_password2').val()) {
+            return '两次密码不一致';
+          }
+        }
+      });
+
+      //监听提交
+      form.on('submit(add)', function (data) {
+        // 通过查找管理员验证用户名是否已被注册
+        $.ajax({
+          headers: {
+            "token": isToken
+          },
+          data: data.field,
+          type: "get",
+          url: "/api/admin/find",
+          success: function (result) {
+            if (result.count == 0) {
+              $.ajax({
+                headers: {
+                  "token": isToken
+                },
+                data: data.field,
+                type: "post",
+                url: "/api/admin/add",
+                success: function (result) {
+                  layer.alert(result.msg, {
+                    icon: 6
+                  }, function () {
+                    // 获得frame索引
+                    var index = parent.layer.getFrameIndex(window.name);
+                    //关闭当前frame
+                    parent.layer.close(index);
+                    parent.location.reload();
+                  });
+                }
+              })
+            } else {
+              // 注册过的
+              layer.alert("此用户名已被注册，请重新输入用户名", {
+                icon: 5
+              })
+            }
+          }
+        })
+        return false;
+      });
+    });
+  </script>
+
+</body>
+
+</html>

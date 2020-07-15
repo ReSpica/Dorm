@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>欢迎页面-X-admin1.0</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport"
+    content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+  <link rel="stylesheet" href="./static/css/font.css">
+  <link rel="stylesheet" href="./static/css/xadmin.css">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="./static/lib/layui/layui.js" charset="utf-8"></script>
+  <script type="text/javascript" src="./static/js/xadmin.js"></script>
+</head>
+
+<body class="layui-anim layui-anim-up">
+  <div class="x-nav">
+    <span class="layui-breadcrumb">
+      <a href="">首页</a>
+      <a>
+        <cite>学号规则</cite>
+      </a>
+    </span>
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right"
+      href="javascript:location.replace(location.href);" title="刷新" id="layui-laypage-btn">
+      <i class="layui-icon" style="line-height:30px">&#xe669;</i></a>
+  </div>
+
+  <div class="x-body">
+    <table class="layui-hide" id="customer_tab" lay-filter="customer_fil"></table>
+    <script type="text/html" id="barDemo">
+      <div class="layui-btn-container">
+        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="redo">重置</a>
+      </div>
+    </script>
+  </div>
+
+  <script>
+    layui.use(['table', 'layer'], function () {
+      var table = layui.table;
+      var layer = layui.layer;
+      var isToken = localStorage.getItem("token")
+
+      // table渲染
+      table.render({
+        elem: '#customer_tab',
+        height: 0,
+        url: '/api/schoolrule/idrule', //数据接口
+        headers: {
+          token: isToken
+        },
+        cols: [
+          [ //表头
+            {
+              field: 'size',
+              title: '学号长度',
+              align: 'center',
+            },
+            {
+              field: 'grade',
+              title: '届号',
+              align: 'center',
+            },
+            {
+              field: 'system',
+              title: '专业号',
+              align: 'center',
+            },
+            {
+              field: 'class',
+              title: '班级号',
+              align: 'center',
+            },
+            {
+              field: 'rank',
+              title: '班级学号',
+              align: 'center',
+            },
+
+            {
+              fixed: 'right',
+              title: '操作',
+              width: '10%',
+              align: 'center',
+              toolbar: '#barDemo'
+            }
+          ]
+        ]
+      });
+
+      //监听工具条
+      table.on('tool(customer_fil)', function (
+        obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+        var data = obj.data; //获得当前行数据
+        var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+        var tr = obj.tr; //获得当前行 tr 的DOM对象
+        var id = data._id;
+        if (layEvent === 'redo') { //重置学号
+          layer.confirm('确定重置你的学号规则吗?', {
+            icon: 5,
+            title: '提示信息'
+          }, function (index) {
+            layer.close(index);
+            layer.open({
+              type: 2,
+              title: '重置学号',
+              area: ['800px', '500px'], //宽高
+              shadeClose: true,
+              content: '01-idrule-edit.html?id=' + id,
+            });
+          });
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>
